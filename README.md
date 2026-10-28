@@ -10,7 +10,7 @@
 
 - Windows 10/11
 - Qt 6.8 或 6.9 + Qt Creator（安装器里勾 **MinGW 64-bit**，不必先装 Visual Studio）
-- Python 3（echo 服务器；安装时勾 Add to PATH）
+- Python 3 可选（备用 echo 服务器；安装时勾 Add to PATH）
 
 ## 构建（命令行示例）
 
@@ -23,13 +23,19 @@ cmake --build build --config Release
 
 ## 怎么玩
 
+启动后默认 `127.0.0.1:19000`，并自动开本机 echo。点 **Connect** → 输入文字回车。
+
+发送格式：2 字节大端长度 + UTF-8 文本。echo 原样送回，下方表格应出现一行。
+
+不要用 **9000**（本机常被别的程序占用）。也不要同时开 Python echo 和窗口里的 **Start local echo**。
+
+备用（可选）：先不要点 Start local echo，另开终端：
+
 ```bat
 python tools\echo_server.py
 ```
 
-再在窗口填 `127.0.0.1` 端口 `9000` → Connect → 输入文字回车。
-
-发送格式：2 字节大端长度 + UTF-8 文本。echo 原样送回，下方表格应出现一行。
+脚本也监听 `127.0.0.1:19000`。Windows 上 `Ctrl+C` 若退不出，在任务管理器结束 `python.exe`。
 
 ## 代码地图
 
@@ -37,6 +43,7 @@ python tools\echo_server.py
 |---|---|
 | `src/MainWindow.*` | 布局、菜单、信号槽、QSettings |
 | `src/TcpSession.*` | `QTcpSocket` 异步收发 |
+| `src/LocalEchoServer.*` | 本机 `127.0.0.1:19000` echo |
 | `src/FrameParser.*` | 粘包：长度前缀 |
 | `docs/qt-basics.md` | 核心知识点 |
 | `PLAN.md` | 14 天任务 |

@@ -12,7 +12,7 @@
 
 **Day 1 安装（按 INSTALL 逐步勾）**  
 打开 [`docs/INSTALL-WINDOWS.md`](docs/INSTALL-WINDOWS.md)，按第 1～6 节做完：注册 Qt 账号 → 下载安装器 → 勾选 **Qt 6.x + MinGW 64-bit + Qt Creator + CMake + Ninja** → 打开本目录的 `CMakeLists.txt` → Run 弹出主窗口。  
-有余力做第 7 节：Python + `echo_server.py` + 发送 `hello`。  
+有余力做第 7 节：Connect `127.0.0.1:19000` + 发送 `hello`（程序会自动开本机 echo）。  
 完成标准以 INSTALL 第 9 节清单为准。不要用 MSVC Kit（除非你已经装了 VS 2022）。
 
 **Day 2 对象树**  
@@ -28,7 +28,7 @@
 菜单已经有。再加 **Help → Qt basics** 打开 `docs/qt-basics.md` 或弹 `QMessageBox` 三句话（信号槽、parent、事件循环）。
 
 **Day 6 TCP**  
-若 Day 1 没做联调：再走一遍 INSTALL 第 5、7 节。终端跑 `python tools/echo_server.py`，程序 Connect `127.0.0.1:9000`，发送 `hello`。对照 `TcpSession.cpp` 讲 `connected` / `readyRead`。
+确认 Port 是 **19000**（不要用 9000），日志有 `Local echo listening on 127.0.0.1:19000`，再 **Connect**，发 `hello`。对照 `TcpSession.cpp` 讲 `connected` / `readyRead`。
 
 **Day 7 日志**  
 给日志加颜色或前缀 TX/RX（可用 `appendHtml` 或保持纯文本加 `[TX]`）。Git 提交：`day7: tcp echo works`。
