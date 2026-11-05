@@ -95,8 +95,8 @@ void MainWindow::buildUi()
     m_log->setReadOnly(true);
     m_log->setPlaceholderText(tr("Raw RX/TX log"));
 
-    m_table = new QTableWidget(0, 3, central);
-    m_table->setHorizontalHeaderLabels({tr("Time"), tr("Len"), tr("Payload")});
+    m_table = new QTableWidget(0, 4, central);
+    m_table->setHorizontalHeaderLabels({tr("Time"), tr("Len"), tr("Payload"), tr("Hex")});
     m_table->horizontalHeader()->setStretchLastSection(true);
     m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -211,6 +211,7 @@ void MainWindow::addFrameRow(const DeviceFrame &fr)
         QDateTime::currentDateTime().toString("HH:mm:ss")));
     m_table->setItem(row, 1, new QTableWidgetItem(QString::number(fr.length)));
     m_table->setItem(row, 2, new QTableWidgetItem(QString::fromUtf8(fr.payload)));
+    m_table->setItem(row, 3, new QTableWidgetItem(QString::fromLatin1(fr.payload.toHex(' '))));
     m_table->scrollToBottom();
 }
 
