@@ -1,0 +1,29 @@
+# Qt / CMake
+build/
+out/
+CMakeLists.txt.user
+*.user
+*.autosave
+
+# MSVC / MinGW
+*.obj
+*.pdb
+*.ilk
+*.exe
+*.dll
+*.a
+*.lib
+
+# Qt Creator
+*.pro.user*
+CMakeUserPresets.json
+
+# IDE
+.vscode/
+.idea/
+.vs/
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
