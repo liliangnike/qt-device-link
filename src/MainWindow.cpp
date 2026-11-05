@@ -42,8 +42,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&m_session, &TcpSession::bytesReceived, this, &MainWindow::onBytes);
     connect(&m_echo, &LocalEchoServer::logLine, this, &MainWindow::appendLog);
 
-    m_hostEdit->setText(QStringLiteral("127.0.0.1"));
-    m_portSpin->setValue(19000);
+    // m_hostEdit->setText(QStringLiteral("127.0.0.1"));
+    // m_portSpin->setValue(19000);
     onStartLocalEcho();
 }
 
@@ -143,8 +143,13 @@ void MainWindow::buildMenus()
 
 void MainWindow::loadSettings()
 {
-    m_hostEdit->setText(QStringLiteral("127.0.0.1"));
-    m_portSpin->setValue(19000);
+    QSettings s;
+
+    const QString host = s.value("host", QStringLiteral("127.0.0.1")).toString();
+    const int port = s.value("port", 19000).toInt();
+
+    m_hostEdit->setText(host);
+    m_portSpin->setValue(port);
 }
 
 void MainWindow::saveSettings()
@@ -287,7 +292,7 @@ void MainWindow::onStartLocalEcho()
 {
     const auto port = static_cast<quint16>(m_portSpin->value());
     if (m_echo.start(port)) {
-        m_hostEdit->setText(QStringLiteral("127.0.0.1"));
+        // m_hostEdit->setText(QStringLiteral("127.0.0.1"));
         m_echoBtn->setEnabled(false);
     }
 }
