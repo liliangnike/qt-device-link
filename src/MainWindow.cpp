@@ -115,6 +115,9 @@ void MainWindow::buildUi()
     m_statusLabel = new QLabel(tr("Disconnected"), this);
     statusBar()->addWidget(m_statusLabel);
 
+    m_rxLabel = new QLabel(tr("RX: 0 bytes"), this);
+    statusBar()->addWidget(m_rxLabel);
+
     connect(m_connectBtn, &QPushButton::clicked, this, &MainWindow::onConnect);
     connect(m_disconnectBtn, &QPushButton::clicked, this, &MainWindow::onDisconnect);
     connect(m_sendBtn, &QPushButton::clicked, this, &MainWindow::onSend);
@@ -263,12 +266,14 @@ void MainWindow::onSend()
 void MainWindow::onConnected()
 {
     setConnectedUi(true);
+    clearRxBytes();
     appendLog(tr("Connected"));
 }
 
 void MainWindow::onDisconnected()
 {
     setConnectedUi(false);
+    clearRxBytes();
     appendLog(tr("Disconnected"));
 }
 
@@ -279,13 +284,30 @@ void MainWindow::onError(const QString &text)
 
 void MainWindow::onBytes(const QByteArray &data)
 {
+    qsizetype data_sz = data.size();
+
+    m_rxBytes += data_sz;
+    updateRxStatus();
+
     appendLog(tr("RX  %1 bytes  %2")
-                  .arg(data.size())
+                  .arg(data_sz)
                   .arg(QString::fromUtf8(data.toHex(' '))));
+
     m_parser.feed(data);
     const auto frames = m_parser.takeFrames();
     for (const auto &fr : frames)
         addFrameRow(fr);
+}
+
+void MainWindow::updateRxStatus()
+{
+    m_rxLabel->setText(tr("RX: %1 bytes").arg(m_rxBytes));
+}
+
+void MainWindow::clearRxBytes()
+{
+    m_rxBytes = 0;
+    updateRxStatus();
 }
 
 void MainWindow::onStartLocalEcho()
@@ -300,6 +322,7 @@ void MainWindow::onStartLocalEcho()
 void MainWindow::onClearLog()
 {
     m_log->clear();
+    clearRxBytes();
     m_table->setRowCount(0);
 }
 

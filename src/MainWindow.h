@@ -51,6 +51,8 @@ private:
     void setConnectedUi(bool on);
     void appendLog(const QString &line);
     void addFrameRow(const DeviceFrame &fr);
+    void clearRxBytes();
+    void updateRxStatus();
 
     TcpSession m_session;
     FrameParser m_parser;
@@ -66,6 +68,8 @@ private:
     QPlainTextEdit *m_log = nullptr;
     QTableWidget *m_table = nullptr;
     QLabel *m_statusLabel = nullptr;
+    QLabel *m_rxLabel = nullptr;
+    quint64 m_rxBytes = 0;
 
     QAction *m_connectAct = nullptr;
     QAction *m_disconnectAct = nullptr;
