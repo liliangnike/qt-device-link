@@ -7,7 +7,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets Network)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Network SerialPort)
 
 qt_add_executable(DeviceLink
     src/main.cpp
@@ -22,7 +22,7 @@ qt_add_executable(DeviceLink
 )
 
 target_include_directories(DeviceLink PRIVATE src)
-target_link_libraries(DeviceLink PRIVATE Qt6::Widgets Qt6::Network)
+target_link_libraries(DeviceLink PRIVATE Qt6::Widgets Qt6::Network Qt6::SerialPort)
 
 if (WIN32)
     set_target_properties(DeviceLink PROPERTIES WIN32_EXECUTABLE TRUE)
