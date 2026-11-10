@@ -19,6 +19,8 @@ qt_add_executable(DeviceLink
     src/FrameParser.cpp
     src/LocalEchoServer.h
     src/LocalEchoServer.cpp
+    src/SerialSession.h
+    src/SerialSession.cpp
 )
 
 target_include_directories(DeviceLink PRIVATE src)
