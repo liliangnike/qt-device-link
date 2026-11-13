@@ -7,14 +7,34 @@ SerialSession::SerialSession(QObject *parent)
     connect(&m_serial_port, &QSerialPort::errorOccurred, this, &SerialSession::onError);
 }
 
+bool SerialSession::isConnected() const
+{
+    return m_serial_port.isOpen();
+}
+
 void SerialSession::openPort(const QString& portName, qint32 baudRate)
 {
+    if(isConnected()) closePort();
+    m_serial_port.setPortName(portName);
+    m_serial_port.setBaudRate(baudRate);
+    if(!m_serial_port.open(QIODevice::ReadWrite)) {
+        emit errorText(m_serial_port.errorString());
+        return;
+    }
     emit connected();
 }
 
 void SerialSession::closePort()
 {
     emit disconnected();
+}
+
+void SerialSession::sendBytes(const QByteArray& data)
+{
+    if(!isConnected() || data.isEmpty())
+        return;
+    m_serial_port.write(data);
+    m_serial_port.flush();
 }
 
 void SerialSession::onReadyRead()
