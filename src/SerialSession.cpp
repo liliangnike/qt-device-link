@@ -26,6 +26,8 @@ void SerialSession::openPort(const QString& portName, qint32 baudRate)
 
 void SerialSession::closePort()
 {
+    if(!isConnected()) return;
+    m_serial_port.close();
     emit disconnected();
 }
 
