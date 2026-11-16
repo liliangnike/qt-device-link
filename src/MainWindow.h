@@ -3,6 +3,7 @@
 #include "FrameParser.h"
 #include "LocalEchoServer.h"
 #include "TcpSession.h"
+#include "SerialSession.h"
 
 #include <QMainWindow>
 
@@ -55,6 +56,7 @@ private:
     void updateRxStatus();
 
     TcpSession m_session;
+    SerialSession m_serial;
     FrameParser m_parser;
     LocalEchoServer m_echo;
 

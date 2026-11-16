@@ -48,5 +48,7 @@ void SerialSession::onReadyRead()
 
 void SerialSession::onError(QSerialPort::SerialPortError error)
 {
+    if(error == QSerialPort::NoError)
+        return;
     emit errorText(m_serial_port.errorString());
 }

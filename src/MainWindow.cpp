@@ -40,6 +40,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&m_session, &TcpSession::disconnected, this, &MainWindow::onDisconnected);
     connect(&m_session, &TcpSession::errorText, this, &MainWindow::onError);
     connect(&m_session, &TcpSession::bytesReceived, this, &MainWindow::onBytes);
+
+    connect(&m_serial, &SerialSession::connected, this, &MainWindow::onConnected);
+    connect(&m_serial, &SerialSession::disconnected, this, &MainWindow::onDisconnected);
+    connect(&m_serial, &SerialSession::errorText, this, &MainWindow::onError);
+    connect(&m_serial, &SerialSession::bytesReceived, this, &MainWindow::onBytes);
+
     connect(&m_echo, &LocalEchoServer::logLine, this, &MainWindow::appendLog);
 
     // m_hostEdit->setText(QStringLiteral("127.0.0.1"));
