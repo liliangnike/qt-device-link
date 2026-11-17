@@ -16,6 +16,7 @@ class QPlainTextEdit;
 class QPushButton;
 class QSpinBox;
 class QTableWidget;
+class QComboBox;
 
 class MainWindow : public QMainWindow
 {

@@ -22,6 +22,7 @@
 #include <QColor>           // Color name
 #include <QTextCharFormat>  // Characters format (color, bold, size, .etc)
 #include <QTextCursor>      // Cursor in QPlainTextEdit
+#include <QComboBox>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
