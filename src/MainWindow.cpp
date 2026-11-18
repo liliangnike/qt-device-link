@@ -71,8 +71,18 @@ QColor MainWindow::getLogColor(const QString &line)
 void MainWindow::buildUi()
 {
     auto *central = new QWidget(this);
-    setCentralWidget(central);
+    setCentralWidget(central);  // QMainWindow only can set one central widget
 
+    // Channel
+    m_channelCombo = new QComboBox(central);
+    m_channelCombo->addItem(tr("TCP"));
+    m_channelCombo->addItem(tr("Serial"));
+
+    auto *channelRow = new QHBoxLayout;
+    channelRow->addWidget(new QLabel(tr("Channel"), central));
+    channelRow->addWidget(m_channelCombo);
+
+    // Tcp Session
     m_hostEdit = new QLineEdit(central);
     m_hostEdit->setPlaceholderText(tr("127.0.0.1"));
     m_portSpin = new QSpinBox(central);
@@ -87,10 +97,39 @@ void MainWindow::buildUi()
     connRow->addWidget(m_hostEdit, 1);
     connRow->addWidget(new QLabel(tr("Port"), central));
     connRow->addWidget(m_portSpin);
-    connRow->addWidget(m_connectBtn);
-    connRow->addWidget(m_disconnectBtn);
     connRow->addWidget(m_echoBtn);
 
+    auto *btnRow = new QHBoxLayout;
+    btnRow->addWidget(m_connectBtn);
+    btnRow->addWidget(m_disconnectBtn);
+    btnRow->addStretch();
+
+    m_tcpRowWidget = new QWidget(central);  // central widget as parent
+    m_tcpRowWidget->setLayout(connRow);
+
+    // Serial Port
+    m_serialPortCombo = new QComboBox(central);
+    m_baudCombo = new QComboBox(central);
+    m_baudCombo->addItems({
+        QStringLiteral("9600"),
+        QStringLiteral("115200"),
+        QStringLiteral("57600")
+    });
+    m_baudCombo->setCurrentText(QStringLiteral("115200"));
+
+    m_refreshPortBtn = new QPushButton(tr("Refresh Ports"), central);
+
+    auto *serialRow = new QHBoxLayout;
+    serialRow->addWidget(new QLabel(tr("Serial Port"), central));
+    serialRow->addWidget(m_serialPortCombo, 1);
+    serialRow->addWidget(new QLabel(tr("Baud"), central));
+    serialRow->addWidget(m_baudCombo);
+    serialRow->addWidget(m_refreshPortBtn);
+
+    m_serialRowWidget = new QWidget(central);
+    m_serialRowWidget->setLayout(serialRow);
+
+    // Data Sending Box
     m_sendEdit = new QLineEdit(central);
     m_sendEdit->setPlaceholderText(tr("Text to send (Enter)"));
     m_sendBtn = new QPushButton(tr("Send"), central);
@@ -98,6 +137,7 @@ void MainWindow::buildUi()
     sendRow->addWidget(m_sendEdit, 1);
     sendRow->addWidget(m_sendBtn);
 
+    // Log Window
     m_log = new QPlainTextEdit(central);
     m_log->setReadOnly(true);
     m_log->setPlaceholderText(tr("Raw RX/TX log"));
@@ -114,8 +154,12 @@ void MainWindow::buildUi()
     split->setStretchFactor(0, 2);
     split->setStretchFactor(1, 1);
 
+    // Main Layout
     auto *layout = new QVBoxLayout(central);
     layout->addLayout(connRow);
+    layout->addWidget(m_tcpRowWidget);
+    layout->addWidget(m_serialRowWidget);
+    layout->addLayout(btnRow);
     layout->addLayout(sendRow);
     layout->addWidget(split, 1);
 
@@ -130,6 +174,8 @@ void MainWindow::buildUi()
     connect(m_sendBtn, &QPushButton::clicked, this, &MainWindow::onSend);
     connect(m_sendEdit, &QLineEdit::returnPressed, this, &MainWindow::onSend);
     connect(m_echoBtn, &QPushButton::clicked, this, &MainWindow::onStartLocalEcho);
+    connect(m_channelCombo, &QComboBox::currentIndexChanged, this, &MainWindow::onChannelChanged);
+    connect(m_refreshPortBtn, &QPushButton::clicked, this, &MainWindow::onRefreshPorts);
 }
 
 void MainWindow::buildMenus()
@@ -324,6 +370,16 @@ void MainWindow::onStartLocalEcho()
         // m_hostEdit->setText(QStringLiteral("127.0.0.1"));
         m_echoBtn->setEnabled(false);
     }
+}
+
+void MainWindow::onChannelChanged(int index)
+{
+    return;
+}
+
+void MainWindow::onRefreshPorts()
+{
+    return;
 }
 
 void MainWindow::onClearLog()

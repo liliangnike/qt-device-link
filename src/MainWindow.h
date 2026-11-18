@@ -40,6 +40,8 @@ private slots:
     void onAbout();
     void onQtBasics();
     void onStartLocalEcho();
+    void onChannelChanged(int index);
+    void onRefreshPorts();
 
 protected:
     void closeEvent(QCloseEvent *event) override;
@@ -55,6 +57,8 @@ private:
     void addFrameRow(const DeviceFrame &fr);
     void clearRxBytes();
     void updateRxStatus();
+    void refreshSerialPorts();
+    void updateChannelUi();
 
     TcpSession m_session;
     SerialSession m_serial;
@@ -73,6 +77,14 @@ private:
     QLabel *m_statusLabel = nullptr;
     QLabel *m_rxLabel = nullptr;
     quint64 m_rxBytes = 0;
+
+    QComboBox *m_channelCombo = nullptr;
+    QComboBox *m_serialPortCombo = nullptr;
+    QComboBox *m_baudCombo = nullptr;
+    QPushButton *m_refreshPortBtn = nullptr;
+
+    QWidget *m_tcpRowWidget = nullptr;
+    QWidget *m_serialRowWidget = nullptr;
 
     QAction *m_connectAct = nullptr;
     QAction *m_disconnectAct = nullptr;
