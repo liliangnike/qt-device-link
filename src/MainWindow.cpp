@@ -23,6 +23,7 @@
 #include <QTextCharFormat>  // Characters format (color, bold, size, .etc)
 #include <QTextCursor>      // Cursor in QPlainTextEdit
 #include <QComboBox>
+#include <QSerialPortInfo>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -156,7 +157,7 @@ void MainWindow::buildUi()
 
     // Main Layout
     auto *layout = new QVBoxLayout(central);
-    layout->addLayout(connRow);
+    layout->addLayout(channelRow);
     layout->addWidget(m_tcpRowWidget);
     layout->addWidget(m_serialRowWidget);
     layout->addLayout(btnRow);
@@ -176,6 +177,9 @@ void MainWindow::buildUi()
     connect(m_echoBtn, &QPushButton::clicked, this, &MainWindow::onStartLocalEcho);
     connect(m_channelCombo, &QComboBox::currentIndexChanged, this, &MainWindow::onChannelChanged);
     connect(m_refreshPortBtn, &QPushButton::clicked, this, &MainWindow::onRefreshPorts);
+
+    refreshSerialPorts();
+    updateChannelUi();
 }
 
 void MainWindow::buildMenus()
@@ -223,6 +227,7 @@ void MainWindow::setConnectedUi(bool on)
     m_sendEdit->setEnabled(on);
     m_hostEdit->setEnabled(!on);
     m_portSpin->setEnabled(!on);
+    m_channelCombo->setEnabled(!on);
     if (m_connectAct)
         m_connectAct->setEnabled(!on);
     if (m_disconnectAct)
@@ -363,6 +368,23 @@ void MainWindow::clearRxBytes()
     updateRxStatus();
 }
 
+void MainWindow::refreshSerialPorts()
+{
+    m_serialPortCombo->clear();
+    for(const QSerialPortInfo& info : QSerialPortInfo::availablePorts()) {
+        m_serialPortCombo->addItem(info.portName());
+    }
+}
+
+void MainWindow::updateChannelUi()
+{
+    const bool isTcp = (m_channelCombo->currentIndex() == 0);
+
+    m_tcpRowWidget->setVisible(isTcp);
+    m_serialRowWidget->setVisible(!isTcp);
+    m_echoBtn->setVisible(isTcp);
+}
+
 void MainWindow::onStartLocalEcho()
 {
     const auto port = static_cast<quint16>(m_portSpin->value());
@@ -374,12 +396,12 @@ void MainWindow::onStartLocalEcho()
 
 void MainWindow::onChannelChanged(int index)
 {
-    return;
+    updateChannelUi();
 }
 
 void MainWindow::onRefreshPorts()
 {
-    return;
+    refreshSerialPorts();
 }
 
 void MainWindow::onClearLog()
