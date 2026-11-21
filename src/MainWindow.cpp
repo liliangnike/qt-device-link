@@ -228,6 +228,9 @@ void MainWindow::setConnectedUi(bool on)
     m_hostEdit->setEnabled(!on);
     m_portSpin->setEnabled(!on);
     m_channelCombo->setEnabled(!on);
+    m_serialPortCombo->setEnabled(!on);
+    m_baudCombo->setEnabled(!on);
+    m_refreshPortBtn->setEnabled(!on);
     if (m_connectAct)
         m_connectAct->setEnabled(!on);
     if (m_disconnectAct)
@@ -283,26 +286,42 @@ void MainWindow::addFrameRow(const DeviceFrame &fr)
 
 void MainWindow::onConnect()
 {
-    const QString host = m_hostEdit->text();
-    if(host.trimmed().isEmpty()) {
-        QMessageBox::warning(this, tr("Connect"), tr("Host IP is empty!"));
-        return;
+    if(isTcpMode()) {
+        const QString host = m_hostEdit->text();
+        if(host.trimmed().isEmpty()) {
+            QMessageBox::warning(this, tr("Connect"), tr("Host IP is empty!"));
+            return;
+        }
+
+        saveSettings();
+        m_parser.reset();
+        appendLog(tr("Connecting to %1:%2 ...")
+                      .arg(host)
+                      .arg(m_portSpin->value()));
+
+        // QString function trimmed is same as Python string strip()
+        m_session.connectTo(host.trimmed(),
+                            static_cast<quint16>(m_portSpin->value()));
     }
-
-    saveSettings();
-    m_parser.reset();
-    appendLog(tr("Connecting to %1:%2 ...")
-                  .arg(host)
-                  .arg(m_portSpin->value()));
-
-    // QString function trimmed is same as Python string strip()
-    m_session.connectTo(host.trimmed(),
-                        static_cast<quint16>(m_portSpin->value()));
+    else { // Serial Port Session
+        const QString portName = m_serialPortCombo->currentText().trimmed();
+        if(portName.isEmpty()) {
+            QMessageBox::warning(this, tr("Connect"), tr("Serial Port is empty!"));
+            return;
+        }
+        const qint32 baud = m_baudCombo->currentText().toInt();
+        m_parser.reset();
+        appendLog(tr("Opening serial port %1 @ %2 ...").arg(portName).arg(baud));
+        m_serial.openPort(portName, baud);
+    }
 }
 
 void MainWindow::onDisconnect()
 {
-    m_session.disconnectFromHost();
+    if(m_session.isConnected())
+        m_session.disconnectFromHost();
+    if(m_serial.isConnected())
+        m_serial.closePort();
 }
 
 void MainWindow::onSend()
@@ -316,7 +335,10 @@ void MainWindow::onSend()
     frame.append(char((len >> 8) & 0xFF));
     frame.append(char(len & 0xFF));
     frame.append(payload);
-    m_session.sendBytes(frame);
+    if(isTcpMode())
+        m_session.sendBytes(frame);
+    else
+        m_serial.sendBytes(frame);
     appendLog(tr("TX  len=%1  %2").arg(len).arg(text));
     m_sendEdit->clear();
 }
@@ -378,7 +400,7 @@ void MainWindow::refreshSerialPorts()
 
 void MainWindow::updateChannelUi()
 {
-    const bool isTcp = (m_channelCombo->currentIndex() == 0);
+    const bool isTcp = isTcpMode();
 
     m_tcpRowWidget->setVisible(isTcp);
     m_serialRowWidget->setVisible(!isTcp);

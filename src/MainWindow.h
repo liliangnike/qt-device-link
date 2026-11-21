@@ -6,6 +6,7 @@
 #include "SerialSession.h"
 
 #include <QMainWindow>
+#include <qcombobox.h>
 
 class QCloseEvent;
 
@@ -57,6 +58,7 @@ private:
     void addFrameRow(const DeviceFrame &fr);
     void clearRxBytes();
     void updateRxStatus();
+    bool isTcpMode() const { return m_channelCombo->currentIndex() == 0; }
     void refreshSerialPorts();
     void updateChannelUi();
 
