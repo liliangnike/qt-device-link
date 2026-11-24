@@ -335,10 +335,14 @@ void MainWindow::onSend()
     frame.append(char((len >> 8) & 0xFF));
     frame.append(char(len & 0xFF));
     frame.append(payload);
-    if(isTcpMode())
+    if(isTcpMode()) {
+        if(!m_session.isConnected()) return;
         m_session.sendBytes(frame);
-    else
+    }
+    else {
+        if(!m_serial.isConnected()) return;
         m_serial.sendBytes(frame);
+    }
     appendLog(tr("TX  len=%1  %2").arg(len).arg(text));
     m_sendEdit->clear();
 }
@@ -354,6 +358,7 @@ void MainWindow::onDisconnected()
 {
     setConnectedUi(false);
     clearRxBytes();
+    m_parser.reset();
     appendLog(tr("Disconnected"));
 }
 
@@ -409,6 +414,7 @@ void MainWindow::updateChannelUi()
 
 void MainWindow::onStartLocalEcho()
 {
+    if(!isTcpMode()) return;
     const auto port = static_cast<quint16>(m_portSpin->value());
     if (m_echo.start(port)) {
         // m_hostEdit->setText(QStringLiteral("127.0.0.1"));
