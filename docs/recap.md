@@ -1,22 +1,25 @@
-# 对着仓库口头总结（第 14 天用）
+# 对着仓库口头总结（面试用）
 
 ## 30 秒
 
-用 Qt 6 在 Windows 上做了一个 TCP 调试工具。界面是 Widgets：连接、发送、日志、解析表。协议是 2 字节大端长度加 payload，自己处理了 TCP 粘包。两周练的是信号槽、布局、`QTcpSocket` 和简单组帧。
+用 Qt 6 Widgets 在 Windows 上做了 **DeviceLink**：**TCP** 或 **串口** 调试客户端。界面选 Channel，连接后发 length-prefix 帧（2 字节大端 + payload），`FrameParser` 处理粘包，日志着色 + 表格 + 状态栏 RX。TCP 自测用内置 **LocalEchoServer**（127.0.0.1:19000）。练了信号槽、布局、`QTcpSocket`、`QSerialPort`、`QSettings`。
 
 ## 可能被问到
 
 **为什么不 QML？**  
-桌面调试工具主流还是 Widgets。两周目标是信号槽和布局，QML 以后再说。
+工控/调试类桌面工具常见 Widgets。本项目标是信号槽和网络/串口，QML 未做。
+
+**TCP 和串口怎么共用逻辑？**  
+`TcpSession` / `SerialSession` 都 `emit bytesReceived`，`MainWindow::onBytes` 同一套；发送按 Channel 分支 `sendBytes`。
 
 **QTableWidget 和 Model/View？**  
-表很小，用 `QTableWidget`。行数到几千应改 `QAbstractTableModel`，避免每个 cell 一个 `QTableWidgetItem`。
+表很小用 `QTableWidget`；大数据应用 `QAbstractTableModel` + `QTableView`。
 
 **会阻塞界面吗？**  
-`QTcpSocket` 异步，收包在 GUI 线程只做 append 和解析，数据量小没问题。大流量应独立线程，用信号把结果送回界面。
+`readyRead` 在 GUI 线程里解析、刷日志，小流量可以。大流量应 worker 线程 + 信号回 UI（本仓库未做 `moveToThread`）。
 
-**和设备上的协议有什么关系？**  
-设备里跑的是协议栈或守护进程；DeviceLink 是电脑上的调试客户端。帧格式、半包、会话是同一类问题，平台不同。
+**和设备协议的关系？**  
+板端跑协议栈；这是 PC 侧调试工具。半包、组帧和设备侧是同一类问题。
 
-**不会什么？**  
-没做串口、QML、自定义 delegate、数据库。需要持久化配置时，本工具这种体量用 `QSettings` 或 SQLite 即可。
+**不会什么 / 诚实边界**  
+QML、自定义 Model、数据库、Modbus、`moveToThread` 实装。串口已做基础 open/read/write，未做流控/RS485 方向脚等工控细节。

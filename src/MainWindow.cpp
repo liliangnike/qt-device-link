@@ -336,11 +336,17 @@ void MainWindow::onSend()
     frame.append(char(len & 0xFF));
     frame.append(payload);
     if(isTcpMode()) {
-        if(!m_session.isConnected()) return;
+        if(!m_session.isConnected()) {
+            appendLog(tr("TCP session is not connected."));
+            return;
+        }
         m_session.sendBytes(frame);
     }
     else {
-        if(!m_serial.isConnected()) return;
+        if(!m_serial.isConnected()) {
+            appendLog(tr("Serial port is not connected."));
+            return;
+        }
         m_serial.sendBytes(frame);
     }
     appendLog(tr("TX  len=%1  %2").arg(len).arg(text));
@@ -443,9 +449,12 @@ void MainWindow::onAbout()
 {
     QMessageBox::about(
         this, tr("About DeviceLink"),
-        tr("A two-week Qt Widgets lab for beginners.\n"
-           "TCP client + length-prefixed frames (uint16 BE + payload).\n"
-           "Connect to 127.0.0.1:19000 (in-app local echo)."));
+        tr("Qt 6 Widgets lab: device debug console.\n"
+           "Channel: TCP (QTcpSocket) or Serial (QSerialPort).\n"
+           "Frame: uint16 BE length + UTF-8 payload; shared FrameParser.\n"
+           "TCP demo: 127.0.0.1:19000 with in-app local echo.\n"
+           "RX/TX on GUI thread; fine for lab traffic.\n"
+           "Not done: QML, Model/View table, moveToThread, Modbus/SQL."));
 }
 
 void MainWindow::onQtBasics()
