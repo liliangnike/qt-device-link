@@ -24,6 +24,7 @@
 #include <QTextCursor>      // Cursor in QPlainTextEdit
 #include <QComboBox>
 #include <QSerialPortInfo>
+#include <QSqlDatabase>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
